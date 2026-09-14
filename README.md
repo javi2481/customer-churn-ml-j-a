@@ -18,13 +18,7 @@ El resto de la estructura esta creada vacia, para ir completando (src, DVC, MLfl
 
 Comparamos tres modelos en el test (particion 80/20, semilla 42).
 
-Nos importa sobre todo el **recall** (cuantos clientes que se van logra detectar el modelo).  
-En este negocio un error cuesta mas que el otro:
-
-- Si marcamos mal a alguien que se queda, lo llamamos de mas (costo chico).
-- Si no detectamos a alguien que se va, perdemos el cliente (costo grande).
-
-Por eso preferimos un modelo que detecte mas abandonos, aunque a veces se equivoque al marcar a alguien estable.
+Nos importa sobre todo el **recall** (cuantos clientes que se van logra detectar el modelo)
 
 | modelo | accuracy | precision | recall | f1 | roc_auc |
 |---|---:|---:|---:|---:|---:|
