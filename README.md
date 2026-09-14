@@ -7,7 +7,7 @@ Clasificacion binaria: estimar si un cliente de telecomunicaciones se va (`Churn
 
 ## Que hay hecho
 
-Solo los notebooks de exploracion:
+Solo los notebooks de eda y exploracion:
 
 1. `notebooks/01_eda.ipynb`
 2. `notebooks/02_exploracion_modelos.ipynb`
