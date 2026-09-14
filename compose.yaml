@@ -1,0 +1,7 @@
+# Entrega 2: levantar la API con Docker Compose.
+# Todavia no se usa en la Entrega 1.
+services:
+  api:
+    build: .
+    ports:
+      - "8000:8000"
