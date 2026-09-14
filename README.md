@@ -9,15 +9,22 @@ Clasificacion binaria: estimar si un cliente de telecomunicaciones se va (`Churn
 
 Solo los notebooks de eda y exploracion:
 
-1. `notebooks/01_eda.ipynb`
-2. `notebooks/02_exploracion_modelos.ipynb`
+1. [notebooks/01_eda.ipynb](https://github.com/javi2481/customer-churn-ml-j-a/blob/main/notebooks/01_eda.ipynb)
+2. [notebooks/02_exploracion_modelos.ipynb](https://github.com/javi2481/customer-churn-ml-j-a/blob/main/notebooks/02_exploracion_modelos.ipynb)
 
 El resto de la estructura esta creada vacia, para ir completando (src, DVC, MLflow).
 
 ## Que modelo elegimos
 
-Comparamos tres modelos en el test (particion 80/20, semilla 42).  
-Nos importa sobre todo el **recall**: cuantos abandonos detectamos. Preferimos contactar de mas antes que perder un cliente sin aviso.
+Comparamos tres modelos en el test (particion 80/20, semilla 42).
+
+Nos importa sobre todo el **recall** (cuantos clientes que se van logra detectar el modelo).  
+En este negocio un error cuesta mas que el otro:
+
+- Si marcamos mal a alguien que se queda, lo llamamos de mas (costo chico).
+- Si no detectamos a alguien que se va, perdemos el cliente (costo grande).
+
+Por eso preferimos un modelo que detecte mas abandonos, aunque a veces se equivoque al marcar a alguien estable.
 
 | modelo | accuracy | precision | recall | f1 | roc_auc |
 |---|---:|---:|---:|---:|---:|
@@ -29,11 +36,11 @@ Nos importa sobre todo el **recall**: cuantos abandonos detectamos. Preferimos c
 
 **Elegimos la regresion logistica (logreg).**
 
-- El baseline acierta ~74% pero no detecta ningun abandono (recall 0). Accuracy sola engaña.
+- El baseline siempre predice “no se va”. Como la mayoria de clientes se queda, acierta ~74% (accuracy alta), pero su recall es 0: no detecta ningun abandono. Por eso mirar solo accuracy no sirve.
 - Logreg mejora recall, F1 y ROC-AUC respecto del baseline.
 - Random Forest queda cerca, pero con peor recall que logreg.
 
-El detalle (graficos y matriz) esta en `notebooks/02_exploracion_modelos.ipynb`.
+El detalle (graficos y matriz) esta en [02_exploracion_modelos.ipynb](https://github.com/javi2481/customer-churn-ml-j-a/blob/main/notebooks/02_exploracion_modelos.ipynb).
 
 ## Estructura
 
