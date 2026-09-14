@@ -25,6 +25,8 @@ Nos importa sobre todo el **recall**: cuantos abandonos detectamos. Preferimos c
 | logreg | 0.794 | 0.663 | 0.449 | 0.535 | 0.812 |
 | rf | 0.783 | 0.642 | 0.401 | 0.493 | 0.790 |
 
+![Recall por modelo](notebooks/figuras/recall_por_modelo.png)
+
 **Elegimos la regresion logistica (logreg).**
 
 - El baseline acierta ~74% pero no detecta ningun abandono (recall 0). Accuracy sola engaña.
@@ -39,6 +41,7 @@ El detalle (graficos y matriz) esta en `notebooks/02_exploracion_modelos.ipynb`.
 customer-churn-ml-j-a/
 ├── data/raw/            # csv historico
 ├── notebooks/
+│   └── figuras/         # graficos de la exploracion
 ├── src/
 │   ├── data/
 │   ├── features/
