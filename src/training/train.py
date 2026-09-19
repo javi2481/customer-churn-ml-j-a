@@ -2,8 +2,8 @@
 
     python -m src.training.train
 
-Corre varios modelos, guarda cada uno como un Run en MLflow
-y deja el candidato (logreg C=1) en models/.
+Corre varios modelos, guarda cada uno como un Run en MLflow,
+registra el candidato en el Model Registry y deja un joblib en models/.
 """
 
 from pathlib import Path
@@ -28,8 +28,9 @@ MLRUNS_PATH = CARPETA_PROYECTO / "mlruns"
 # nombre del experimento en MLflow
 EXPERIMENTO = "churn-entrega-1"
 
-# el candidato que guardamos en joblib (tiene que coincidir con un run)
+# el candidato que guardamos en joblib y en el Registry
 CANDIDATO = "logreg_C1"
+NOMBRE_REGISTRY = "churn-classifier"
 
 
 def build_model_pipeline(modelo, X_train):
@@ -44,7 +45,7 @@ def build_model_pipeline(modelo, X_train):
 
 def correr_run(nombre, modelo, X_train, y_train, X_test, y_test, params, usar_pipeline=True):
     """Entrena un modelo, lo evalua y lo anota en MLflow."""
-    with mlflow.start_run(run_name=nombre):
+    with mlflow.start_run(run_name=nombre) as run:
         # que modelo y con que hiperparametros
         mlflow.log_param("modelo", nombre)
         for clave, valor in params.items():
@@ -68,7 +69,7 @@ def correr_run(nombre, modelo, X_train, y_train, X_test, y_test, params, usar_pi
         # guardamos el modelo adentro del run
         mlflow.sklearn.log_model(entrenado, "model")
 
-        return entrenado
+        return entrenado, run.info.run_id
 
 
 def main():
@@ -98,7 +99,7 @@ def main():
     )
 
     # 2) candidato del notebook / README
-    pipe_candidato = correr_run(
+    pipe_candidato, run_id_candidato = correr_run(
         CANDIDATO,
         LogisticRegression(max_iter=1000, C=1.0, random_state=42),
         X_train,
@@ -156,10 +157,17 @@ def main():
         params={"n_estimators": 100, "max_depth": 10},
     )
 
+    # Model Registry: este modelo sale de ESTE run (lineage)
+    model_uri = f"runs:/{run_id_candidato}/model"
+    registrada = mlflow.register_model(model_uri, NOMBRE_REGISTRY)
+    print("\nRegistry:", NOMBRE_REGISTRY)
+    print("Version:", registrada.version)
+    print("Run de origen:", run_id_candidato)
+
     # joblib del candidato (mismo que el run logreg_C1)
     MODEL_PATH.parent.mkdir(exist_ok=True)
     joblib.dump(pipe_candidato, MODEL_PATH)
-    print("\nCandidato guardado:", MODEL_PATH)
+    print("Candidato guardado:", MODEL_PATH)
     print("Runs en MLflow. Para verlos: mlflow ui --backend-store-uri", MLRUNS_PATH)
 
 

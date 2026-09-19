@@ -25,13 +25,15 @@ El train unico se partio en `src/` asi:
 - `src/training/train.py` — corre ≥6 runs y los anota en MLflow
 - `src/evaluation/metrics.py` — accuracy, precision, recall, F1, ROC-AUC
 
-Para ver los experimentos:
+Para ver los experimentos (y el Model Registry):
 
 ```text
 mlflow ui --backend-store-uri ./mlruns
 ```
 
-Falta Model Registry y DVC.
+El candidato queda registrado como `churn-classifier` (sale del run `logreg_C1`).
+
+Falta DVC (CSV fuera de Git) y el tag entrega-1.
 
 ## Candidato oficial
 
