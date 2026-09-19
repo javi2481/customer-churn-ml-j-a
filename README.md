@@ -22,10 +22,16 @@ El train unico se partio en `src/` asi:
 
 - `src/data/dataset.py` — lee el CSV y hace el split 80/20
 - `src/features/preprocessor.py` — impute, one-hot y scale
-- `src/training/train.py` — corre baseline, logreg y random forest
+- `src/training/train.py` — corre ≥6 runs y los anota en MLflow
 - `src/evaluation/metrics.py` — accuracy, precision, recall, F1, ROC-AUC
 
-Falta DVC y MLflow.
+Para ver los experimentos:
+
+```text
+mlflow ui --backend-store-uri ./mlruns
+```
+
+Falta Model Registry y DVC.
 
 ## Candidato oficial
 
