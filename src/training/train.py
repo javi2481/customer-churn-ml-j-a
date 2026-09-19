@@ -44,7 +44,10 @@ def build_model_pipeline(modelo, X_train):
 
 
 def correr_run(nombre, modelo, X_train, y_train, X_test, y_test, params, usar_pipeline=True):
-    """Entrena un modelo, lo evalua y lo anota en MLflow."""
+    """Entrena un modelo, lo evalua y lo anota en MLflow. Devuelve (modelo, run_id)."""
+    entrenado = modelo
+    run_id = ""
+
     with mlflow.start_run(run_name=nombre) as run:
         # que modelo y con que hiperparametros
         mlflow.log_param("modelo", nombre)
@@ -68,8 +71,9 @@ def correr_run(nombre, modelo, X_train, y_train, X_test, y_test, params, usar_pi
 
         # guardamos el modelo adentro del run
         mlflow.sklearn.log_model(entrenado, "model")
+        run_id = str(run.info.run_id)
 
-        return entrenado, run.info.run_id
+    return entrenado, run_id
 
 
 def main():
@@ -77,8 +81,8 @@ def main():
     X_train, X_test, y_train, y_test = split_data(df)
 
     print("filas, columnas:", df.shape)
-    print("Train:", X_train.shape)
-    print("Test:", X_test.shape)
+    print("Train:", X_train.shape)  # type: ignore[union-attr]
+    print("Test:", X_test.shape)  # type: ignore[union-attr]
 
     # los runs se guardan en la carpeta mlruns/ del proyecto
     mlflow.set_tracking_uri(MLRUNS_PATH.as_uri())

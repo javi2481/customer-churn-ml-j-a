@@ -18,7 +18,7 @@ RANDOM_STATE = 42
 TEST_SIZE = 0.20
 
 
-def load_data(path=None):
+def load_data(path=None) -> pd.DataFrame:
     """Lee el CSV historico."""
     if path is None:
         path = CSV_PATH
@@ -31,7 +31,7 @@ def load_data(path=None):
     return df
 
 
-def split_data(df):
+def split_data(df: pd.DataFrame):
     """Separa train/test 80/20. stratify mantiene el % de churn."""
     df = df.copy()
 
@@ -51,4 +51,5 @@ def split_data(df):
         random_state=RANDOM_STATE,
         stratify=y,
     )
+    # train_test_split siempre devuelve DataFrames/Series aca
     return X_train, X_test, y_train, y_test
