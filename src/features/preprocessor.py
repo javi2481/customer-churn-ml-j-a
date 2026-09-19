@@ -21,10 +21,10 @@ NUMERICAS = [
 
 def build_preprocessor(X):
     """Arma el ColumnTransformer segun las columnas de X."""
-    numericas = [c for c in NUMERICAS if c in X.columns]
-    categoricas = [c for c in X.columns if c not in numericas]
+    # el resto de columnas de X son categoricas
+    categoricas = [c for c in X.columns if c not in NUMERICAS]
 
-    # nulos de TotalCharges (tenure=0) -> mediana
+    # Numericas: mediana + escalado
     pipe_num = Pipeline(
         steps=[
             ("imputar", SimpleImputer(strategy="median")),
@@ -32,7 +32,7 @@ def build_preprocessor(X):
         ]
     )
 
-    # texto -> numeros (one-hot). handle_unknown: si aparece una categoria nueva, no explota
+    # Categoricas: moda + one-hot
     pipe_cat = Pipeline(
         steps=[
             ("imputar", SimpleImputer(strategy="most_frequent")),
@@ -42,7 +42,7 @@ def build_preprocessor(X):
 
     preprocesador = ColumnTransformer(
         transformers=[
-            ("num", pipe_num, numericas),
+            ("num", pipe_num, NUMERICAS),
             ("cat", pipe_cat, categoricas),
         ]
     )
