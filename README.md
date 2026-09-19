@@ -7,32 +7,45 @@ Clasificacion binaria: estimar si un cliente de telecomunicaciones se va (`Churn
 
 ## Que hay hecho
 
-Solo los notebooks de eda y exploracion:
+Notebooks de eda y exploracion:
 
 1. [notebooks/01_eda.ipynb](https://github.com/javi2481/customer-churn-ml-j-a/blob/main/notebooks/01_eda.ipynb)
 2. [notebooks/02_exploracion_modelos.ipynb](https://github.com/javi2481/customer-churn-ml-j-a/blob/main/notebooks/02_exploracion_modelos.ipynb)
 
-El resto de la estructura esta creada vacia, para ir completando (src, DVC, MLflow).
+Entrenamiento por consola (misma logica que el notebook 02):
 
-## Que modelo elegimos
+```text
+python -m src.training.train
+```
 
-Comparamos tres modelos en el test (particion 80/20, semilla 42).
+El train unico se partio en `src/` asi:
 
-Nos importa sobre todo el **recall** (cuantos clientes que se van logra detectar el modelo)
+- `src/data/dataset.py` — lee el CSV y hace el split 80/20
+- `src/features/preprocessor.py` — impute, one-hot y scale
+- `src/training/train.py` — corre baseline, logreg y random forest
+- `src/evaluation/metrics.py` — accuracy, precision, recall, F1, ROC-AUC
+
+Falta DVC y MLflow.
+
+## Candidato oficial
+
+Fuente de verdad: metricas del notebook ejecutado `notebooks/02_exploracion_modelos.ipynb` (split 80/20, `random_state=42`, `stratify=y`).
+
+**Candidato:** `LogisticRegression(C=1.0, max_iter=1000, random_state=42)` dentro del Pipeline de preprocessing.
 
 | modelo | accuracy | precision | recall | f1 | roc_auc |
 |---|---:|---:|---:|---:|---:|
-| baseline | 0.736 | 0.000 | 0.000 | 0.000 | 0.500 |
-| logreg | 0.794 | 0.663 | 0.449 | 0.535 | 0.812 |
-| rf | 0.783 | 0.642 | 0.401 | 0.493 | 0.790 |
+| baseline (`most_frequent`) | 0.736 | 0.000 | 0.000 | 0.000 | 0.500 |
+| **logreg C=1 (candidato)** | **0.794** | 0.663 | **0.449** | **0.535** | **0.812** |
+| random forest 100 | 0.783 | 0.642 | 0.401 | 0.493 | 0.790 |
 
 ![Recall por modelo](notebooks/figuras/recall_por_modelo.png)
 
-**Elegimos la regresion logistica (logreg).**
+Nos importa sobre todo el **recall**: un falso negativo (cliente que se va y el modelo no avisa) cuesta mas que un falso positivo (llamar de mas).
 
-- El baseline siempre predice “no se va”. Como la mayoria de clientes se queda, acierta ~74% (accuracy alta), pero su recall es 0: no detecta ningun abandono. Por eso mirar solo accuracy no sirve.
-- Logreg mejora recall, F1 y ROC-AUC respecto del baseline.
-- Random Forest queda cerca, pero con peor recall que logreg.
+- El baseline siempre predice “no se va”. Accuracy ~74%, recall 0. Por eso Accuracy no decide.
+- Logreg gana a RF en recall, F1 y ROC-AUC.
+- `class_weight='balanced'` **no es el candidato todavia**: no esta corrido en el notebook. Entra como run extra de MLflow. Si mejora recall, se actualizan juntos README, tabla y Model Registry.
 
 El detalle (graficos y matriz) esta en [02_exploracion_modelos.ipynb](https://github.com/javi2481/customer-churn-ml-j-a/blob/main/notebooks/02_exploracion_modelos.ipynb).
 

@@ -1,4 +1,9 @@
-"""Metricas de clasificacion. Accuracy sola no alcanza: tambien recall."""
+"""Metricas de los modelos.
+
+Aca no se entrena: solo se mira que tan bien salio el test.
+Accuracy sola no sirve (el dummy ya acierta ~74% sin detectar churn).
+En este negocio nos importa mas el recall.
+"""
 
 from sklearn.metrics import (
     accuracy_score,
@@ -10,7 +15,9 @@ from sklearn.metrics import (
 
 
 def evaluate_model(model, X_test, y_test):
+    """Calcula metricas. zero_division=0: si no predice ningun churn, precision queda 0."""
     pred = model.predict(X_test)
+    # probabilidad de clase 1 (churn) para el ROC-AUC
     proba = model.predict_proba(X_test)[:, 1]
 
     return {
