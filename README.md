@@ -33,7 +33,7 @@ mlflow ui --backend-store-uri ./mlruns
 
 El candidato queda registrado como `churn-classifier` (sale del run `logreg_C1`).
 
-Falta DVC (CSV fuera de Git) y el tag entrega-1.
+DVC implementado. El dataset se encuentra versionado mediante DVC y fuera del control directo de Git.
 
 ## Candidato oficial
 
@@ -86,4 +86,51 @@ customer-churn-ml-j-a/
 
 ## Dataset
 
+El dataset utilizado es:
+
 `data/raw/customer_churn_historical.csv`
+
+Ahora se encuentra versionado con DVC, por lo que ya no forma parte del control de versiones directo de Git.
+
+Para recuperar el dataset en una copia nueva del repositorio:
+
+```bash
+dvc pull
+```
+
+Para comprobar el estado de los datos:
+
+```bash
+dvc status
+```
+
+## Reproducir el entrenamiento
+
+Instalar dependencias:
+
+```bash
+pip install -r requirements.txt
+```
+
+Recuperar el dataset:
+
+```bash
+dvc pull
+```
+
+Ejecutar el entrenamiento:
+
+```bash
+python -m src.training.train
+```
+
+El entrenamiento deja registrados los experimentos en MLflow y genera el modelo candidato en `models/`.
+
+## Estado actual
+
+- Notebooks de EDA y exploración terminados.
+- Entrenamiento reproducible desde consola.
+- Preprocesamiento separado en módulos.
+- MLflow y Model Registry integrados.
+- Dataset versionado con DVC.
+- Pendiente: tag `entrega-1`.
