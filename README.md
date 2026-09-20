@@ -133,4 +133,4 @@ El entrenamiento deja registrados los experimentos en MLflow y genera el modelo 
 - Preprocesamiento separado en módulos.
 - MLflow y Model Registry integrados.
 - Dataset versionado con DVC.
-- Pendiente: tag `entrega-1`.
+- Dataset almacenado en DagsHub mediante remote DVC.
