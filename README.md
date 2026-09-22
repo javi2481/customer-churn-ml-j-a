@@ -7,7 +7,7 @@ Prediccion de abandono de clientes (churn).
 | **Institucion** | ISTEA |
 | **Materia** | Laboratorio de Mineria de Datos |
 | **Año / cuatrimestre** | 2026 — 2.º cuatrimestre |
-| **Equipo** | Rodolfo Berrone y Andrea Romero |
+| **Equipo** | Rodolfo Berrone y Andrea Romeo |
 | **Entrega** | 1ra entrega · despues lo afinamos con el feedback del profe |
 
 Clasificacion binaria: estimar si un cliente de telecomunicaciones se va (`Churn`).
