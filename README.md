@@ -127,6 +127,8 @@ Instalar dependencias:
 pip install -r requirements.txt
 ```
 
+Incluye `dvc[s3]` para poder hacer `dvc pull` contra el remote de DagsHub.
+
 Recuperar el dataset:
 
 ```bash
