@@ -1,11 +1,18 @@
 # customer-churn-ml-j-a
 
-Prediccion de abandono de clientes (churn) — Laboratorio de Mineria de Datos (ISTEA).  
-Equipo: Javier + Andrea.
+Prediccion de abandono de clientes (churn).
+
+| | |
+|---|---|
+| **Institucion** | ISTEA |
+| **Materia** | Laboratorio de Mineria de Datos |
+| **Anio / cuatrimestre** | 2026 — 2.º cuatrimestre |
+| **Equipo** | Rodolfo Berrone y Andrea Romero |
+| **Entrega** | 1ra entrega · despues lo afinamos con el feedback del profe |
 
 Clasificacion binaria: estimar si un cliente de telecomunicaciones se va (`Churn`).
 
-## Que hay hecho
+## Hasta ahora
 
 Notebooks de eda y exploracion:
 
