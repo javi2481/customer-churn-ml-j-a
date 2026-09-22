@@ -99,7 +99,7 @@ El dataset utilizado es:
 
 Esta versionado con DVC y alojado en DagsHub:
 
-https://dagshub.com/rjavierst/customer-churn-ml-j-a
+https://dagshub.com/javi2481/customer-churn-ml-j-a
 
 No forma parte del control de versiones directo de Git.
 
