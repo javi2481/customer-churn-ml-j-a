@@ -90,9 +90,24 @@ El dataset utilizado es:
 
 `data/raw/customer_churn_historical.csv`
 
-Ahora se encuentra versionado con DVC, por lo que ya no forma parte del control de versiones directo de Git.
+Esta versionado con DVC y alojado en DagsHub:
 
-Para recuperar el dataset en una copia nueva del repositorio:
+https://dagshub.com/rjavierst/customer-churn-ml-j-a
+
+No forma parte del control de versiones directo de Git.
+
+### Configurar el remote (una vez por maquina)
+
+El `.dvc/config` del repo ya apunta al storage. Falta autenticar en local con un token de DagsHub (Settings → Access → Tokens):
+
+```bash
+dvc remote modify origin --local access_key_id <TOKEN>
+dvc remote modify origin --local secret_access_key <TOKEN>
+```
+
+Eso se guarda en `.dvc/config.local` (no se sube a Git).
+
+### Recuperar el dataset
 
 ```bash
 dvc pull
