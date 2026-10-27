@@ -77,7 +77,8 @@ customer-churn-ml-j-a/
 │   ├── training/
 │   ├── evaluation/
 │   └── inference/
-├── app/
+├── app/                 # FastAPI (/health, /predict)
+├── examples/            # payloads del curso para /predict
 ├── tests/
 ├── monitoring/
 ├── models/
@@ -150,11 +151,33 @@ python -m src.training.train
 
 El entrenamiento deja registrados los experimentos en MLflow y genera el modelo candidato en `models/`.
 
+## API de inferencia (entrega 2)
+
+La capa de inferencia carga el mismo joblib del candidato:
+
+```text
+python -m src.inference.predict examples/predict_request_valid.json
+```
+
+API con FastAPI (Swagger en `/docs`):
+
+```text
+uvicorn app.main:app --reload --port 8000
+```
+
+- `GET /health` — si el servicio responde y que version de modelo cargo
+- `POST /predict` — body = `examples/predict_request_valid.json`
+- Respuesta: `prediction`, `probability`, `risk_level` (`LOW`/`MEDIUM`/`HIGH`), `model_version`
+
+Los ejemplos de payload vienen del paquete de datos del curso (`examples/`).
+Pytest + Docker/Compose los cerramos con Andrea. Monitoring, CI y `request_id` quedan para mas adelante (no van en esta entrega).
+
 ## Estado actual
 
-- Notebooks de EDA y exploración terminados.
+- Notebooks de EDA y exploracion terminados.
 - Entrenamiento reproducible desde consola.
-- Preprocesamiento separado en módulos.
+- Preprocesamiento separado en modulos.
 - MLflow y Model Registry integrados.
 - Dataset versionado con DVC.
 - Dataset almacenado en DagsHub mediante remote DVC.
+- Inferencia por consola + API `/health` y `/predict` (FastAPI).
