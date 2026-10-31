@@ -19,8 +19,8 @@ NUMERICAS = [
 ]
 
 
+# Esta funcion sirve para armar el preprocessing (imputar, escalar, one-hot) segun las columnas de X
 def build_preprocessor(X):
-    """Arma el ColumnTransformer segun las columnas de X."""
     # el resto de columnas de X son categoricas
     categoricas = [c for c in X.columns if c not in NUMERICAS]
 

@@ -33,8 +33,9 @@ CANDIDATO = "logreg_C1"
 NOMBRE_REGISTRY = "churn-classifier"
 
 
+# Esta funcion sirve para unir el preprocessing y el modelo en un solo Pipeline
 def build_model_pipeline(modelo, X_train):
-    """Pega el preprocessing al modelo. Se guarda junto, no aparte."""
+    """Se guarda junto, no aparte, para que train e inferencia usen lo mismo."""
     return Pipeline(
         steps=[
             ("preprocesar", build_preprocessor(X_train)),
@@ -43,8 +44,9 @@ def build_model_pipeline(modelo, X_train):
     )
 
 
+# Esta funcion sirve para entrenar un modelo, evaluarlo y anotarlo como Run en MLflow
 def correr_run(nombre, modelo, X_train, y_train, X_test, y_test, params, usar_pipeline=True):
-    """Entrena un modelo, lo evalua y lo anota en MLflow. Devuelve (modelo, run_id)."""
+    """Devuelve (modelo, run_id)."""
     entrenado = modelo
     run_id = ""
 
@@ -76,6 +78,7 @@ def correr_run(nombre, modelo, X_train, y_train, X_test, y_test, params, usar_pi
     return entrenado, run_id
 
 
+# Esta funcion sirve para correr todos los modelos, elegir el candidato y guardarlo
 def main():
     df = load_data()
     X_train, X_test, y_train, y_test = split_data(df)

@@ -18,8 +18,8 @@ RANDOM_STATE = 42
 TEST_SIZE = 0.20
 
 
+# Esta funcion sirve para leer el CSV historico y pasar TotalCharges a numero
 def load_data(path=None) -> pd.DataFrame:
-    """Lee el CSV historico."""
     if path is None:
         path = CSV_PATH
 
@@ -31,8 +31,9 @@ def load_data(path=None) -> pd.DataFrame:
     return df
 
 
+# Esta funcion sirve para separar el dataset en train/test 80/20 y armar X / y
 def split_data(df: pd.DataFrame):
-    """Separa train/test 80/20. stratify mantiene el % de churn."""
+    """stratify mantiene el % de churn en train y en test."""
     df = df.copy()
 
     # Yes -> 1 (se va), No -> 0 (se queda)

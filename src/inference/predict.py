@@ -51,8 +51,9 @@ RISK_MEDIUM_MAX = 0.70
 _modelo = None
 
 
+# Esta funcion sirve para cargar el modelo desde el joblib
 def get_model():
-    """Carga el joblib. Lo deja en memoria para no leerlo en cada request."""
+    """Lo deja en memoria para no leerlo en cada request."""
     global _modelo
     if _modelo is None:
         if not MODEL_PATH.exists():
@@ -64,8 +65,8 @@ def get_model():
     return _modelo
 
 
+# Esta funcion sirve para pasar la probabilidad a LOW / MEDIUM / HIGH
 def risk_from_probability(probability):
-    """Pasa la probabilidad a LOW / MEDIUM / HIGH."""
     if probability < RISK_LOW_MAX:
         return "LOW"
     if probability < RISK_MEDIUM_MAX:
@@ -73,8 +74,9 @@ def risk_from_probability(probability):
     return "HIGH"
 
 
+# Esta funcion sirve para predecir el churn de un cliente con el pipeline completo
 def predict_churn(features: dict) -> dict:
-    """Corre el pipeline completo. Devuelve el dict de respuesta de la API."""
+    """Devuelve el dict de respuesta de la API."""
     modelo = get_model()
 
     faltan = [c for c in FEATURE_COLUMNS if c not in features]
@@ -94,6 +96,7 @@ def predict_churn(features: dict) -> dict:
     }
 
 
+# Esta funcion sirve para predecir desde consola a partir de un archivo JSON
 def main():
     parser = argparse.ArgumentParser(description="Predice churn desde un JSON.")
     parser.add_argument(

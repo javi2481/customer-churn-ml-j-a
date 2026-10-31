@@ -23,6 +23,7 @@ PaymentMethod = Literal[
 ]
 
 
+# Esta clase sirve para validar el JSON de entrada de /predict
 class CustomerFeatures(BaseModel):
     """Features del cliente para /predict."""
 
@@ -47,6 +48,7 @@ class CustomerFeatures(BaseModel):
     TotalCharges: float
 
 
+# Esta clase sirve para definir la respuesta de /predict
 class PredictResponse(BaseModel):
     prediction: Literal["CHURN", "NO_CHURN"]
     probability: float = Field(ge=0.0, le=1.0)
@@ -54,6 +56,7 @@ class PredictResponse(BaseModel):
     model_version: str
 
 
+# Esta clase sirve para definir la respuesta de /health
 class HealthResponse(BaseModel):
     status: str
     model_loaded: bool

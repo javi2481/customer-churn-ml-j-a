@@ -15,12 +15,14 @@ from src.inference.predict import MODEL_VERSION, get_model, predict_churn
 app = FastAPI(title="Customer Churn API", version=MODEL_VERSION)
 
 
+# Esta funcion sirve para cargar el modelo cuando arranca la API
 @app.on_event("startup")
 def startup():
     # si no esta el joblib, mejor fallar al arrancar
     get_model()
 
 
+# Esta funcion sirve para avisar si el servicio esta arriba y que version de modelo cargo
 @app.get("/health", response_model=HealthResponse)
 def health():
     try:
@@ -38,6 +40,7 @@ def health():
         )
 
 
+# Esta funcion sirve para recibir un cliente, validarlo y devolver la prediccion de churn
 @app.post("/predict", response_model=PredictResponse)
 def predict(payload: CustomerFeatures):
     try:

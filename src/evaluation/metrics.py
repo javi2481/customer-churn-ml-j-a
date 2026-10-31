@@ -14,8 +14,9 @@ from sklearn.metrics import (
 )
 
 
+# Esta funcion sirve para calcular las metricas del modelo sobre test
 def evaluate_model(model, X_test, y_test):
-    """Calcula metricas. zero_division=0: si no predice ningun churn, precision queda 0."""
+    """zero_division=0: si no predice ningun churn, precision queda 0."""
     pred = model.predict(X_test)
     # probabilidad de clase 1 (churn) para el ROC-AUC
     proba = model.predict_proba(X_test)[:, 1]
@@ -29,6 +30,7 @@ def evaluate_model(model, X_test, y_test):
     }
 
 
+# Esta funcion sirve para mostrar las metricas de un modelo por consola
 def print_metrics(nombre, metrics):
     print(f"\n{nombre}")
     print("accuracy:", round(metrics["accuracy"], 3))
