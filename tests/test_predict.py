@@ -11,6 +11,7 @@ EJEMPLO_INVALIDO = CARPETA_PROYECTO / "examples" / "predict_request_invalid.json
 
 def test_predict_success(client, sample_customer):
     """Cliente valido: 200 y los 4 campos con sus tipos."""
+    # client.post: manda el cliente como JSON a /predict
     response = client.post("/predict", json=sample_customer)
 
     assert response.status_code == 200
@@ -31,6 +32,7 @@ def test_predict_success(client, sample_customer):
 
 def test_predict_invalid_payload(client):
     """El JSON invalido de examples/ devuelve 422."""
+    # json.loads: lee el archivo y lo pasa a dict
     payload = json.loads(EJEMPLO_INVALIDO.read_text(encoding="utf-8"))
 
     response = client.post("/predict", json=payload)
@@ -38,6 +40,7 @@ def test_predict_invalid_payload(client):
     assert response.status_code == 422
 
 
+# parametrize: corre el test una vez por cada (campo, valor invalido)
 @pytest.mark.parametrize(
     "campo, valor",
     [

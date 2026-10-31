@@ -5,6 +5,8 @@ from src.inference.predict import FEATURE_COLUMNS
 
 def test_required_columns_exist(df_raw):
     """El CSV tiene todas las columnas que usa el modelo."""
+    # FEATURE_COLUMNS: lista de columnas que recibe el modelo
+    # issubset: todas las de la lista estan en el CSV
     assert set(FEATURE_COLUMNS).issubset(df_raw.columns)
 
 

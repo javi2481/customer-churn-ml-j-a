@@ -3,6 +3,7 @@ from src.inference.predict import MODEL_VERSION
 
 def test_health(client):
     """/health responde 200, status ok, modelo cargado y su version."""
+    # client.get: le pega a /health como si fuera un navegador
     response = client.get("/health")
 
     assert response.status_code == 200
