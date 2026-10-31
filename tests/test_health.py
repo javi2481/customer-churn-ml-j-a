@@ -1,8 +1,8 @@
 from src.inference.predict import MODEL_VERSION
 
 
+# Esta funcion sirve para comprobar que /health responde ok, con el modelo cargado y su version
 def test_health(client):
-    """/health responde 200, status ok, modelo cargado y su version."""
     # client.get: le pega a /health como si fuera un navegador
     response = client.get("/health")
 

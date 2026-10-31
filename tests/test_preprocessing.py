@@ -6,8 +6,8 @@ from src.data import split_data
 from src.training.train import build_model_pipeline
 
 
+# Esta funcion sirve para comprobar que el pipeline entrena con nulos y predice igual
 def test_preprocessor_handles_missing_values(df_raw):
-    """Entrena el pipeline con nulos en los datos y igual predice 5 filas."""
     # split_data: separa el CSV en train/test 80/20 (X sin Churn ni customerID)
     X_train, X_test, y_train, y_test = split_data(df_raw)
 
@@ -22,8 +22,8 @@ def test_preprocessor_handles_missing_values(df_raw):
     assert len(preds) == 5
 
 
+# Esta funcion sirve para comprobar que Churn y customerID no quedan en X
 def test_split_does_not_include_target_or_id(df_raw):
-    """Churn y customerID no quedan en X (no son predictores)."""
     # split_data: separa el CSV en train/test 80/20
     X_train, X_test, y_train, y_test = split_data(df_raw)
 

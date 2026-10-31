@@ -9,8 +9,8 @@ CARPETA_PROYECTO = Path(__file__).resolve().parent.parent
 EJEMPLO_INVALIDO = CARPETA_PROYECTO / "examples" / "predict_request_invalid.json"
 
 
+# Esta funcion sirve para comprobar que un cliente valido da 200 y los 4 campos con sus tipos
 def test_predict_success(client, sample_customer):
-    """Cliente valido: 200 y los 4 campos con sus tipos."""
     # client.post: manda el cliente como JSON a /predict
     response = client.post("/predict", json=sample_customer)
 
@@ -30,8 +30,8 @@ def test_predict_success(client, sample_customer):
     assert 0.0 <= data["probability"] <= 1.0
 
 
+# Esta funcion sirve para comprobar que el JSON invalido de examples/ devuelve 422
 def test_predict_invalid_payload(client):
-    """El JSON invalido de examples/ devuelve 422."""
     # json.loads: lee el archivo y lo pasa a dict
     payload = json.loads(EJEMPLO_INVALIDO.read_text(encoding="utf-8"))
 
@@ -40,6 +40,7 @@ def test_predict_invalid_payload(client):
     assert response.status_code == 422
 
 
+# Esta funcion sirve para comprobar que un campo con valor invalido devuelve 422
 # parametrize: corre el test una vez por cada (campo, valor invalido)
 @pytest.mark.parametrize(
     "campo, valor",
@@ -52,7 +53,6 @@ def test_predict_invalid_payload(client):
     ],
 )
 def test_invalid_customer_is_rejected(client, sample_customer, campo, valor):
-    """Un campo con valor invalido devuelve 422."""
     sample_customer[campo] = valor
 
     response = client.post("/predict", json=sample_customer)
@@ -60,8 +60,8 @@ def test_invalid_customer_is_rejected(client, sample_customer, campo, valor):
     assert response.status_code == 422
 
 
+# Esta funcion sirve para comprobar que si falta un campo devuelve 422
 def test_missing_field_is_rejected(client, sample_customer):
-    """Si falta un campo devuelve 422."""
     del sample_customer["Contract"]
 
     response = client.post("/predict", json=sample_customer)
@@ -69,8 +69,8 @@ def test_missing_field_is_rejected(client, sample_customer):
     assert response.status_code == 422
 
 
+# Esta funcion sirve para comprobar que un JSON vacio devuelve 422
 def test_empty_body_is_rejected(client):
-    """Un JSON vacio devuelve 422."""
     response = client.post("/predict", json={})
 
     assert response.status_code == 422

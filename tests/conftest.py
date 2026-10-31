@@ -14,21 +14,21 @@ CARPETA_PROYECTO = Path(__file__).resolve().parent.parent
 EJEMPLO_VALIDO = CARPETA_PROYECTO / "examples" / "predict_request_valid.json"
 
 
+# Esta funcion sirve para darle a los tests un cliente valido (el JSON de examples/)
 @pytest.fixture
 def sample_customer():
-    """Cliente valido (el mismo JSON de examples/)."""
     return json.loads(EJEMPLO_VALIDO.read_text(encoding="utf-8"))
 
 
+# Esta funcion sirve para darle a los tests el CSV historico (necesita dvc pull antes)
 @pytest.fixture
 def df_raw():
-    """CSV historico. Necesita dvc pull antes."""
     return load_data()
 
 
+# Esta funcion sirve para levantar la API en memoria y pegarle sin uvicorn
 @pytest.fixture
 def client():
-    """Levanta la API en memoria para pegarle sin uvicorn."""
     # como context manager para que corra el startup de la API
     with TestClient(app) as c:
         yield c
