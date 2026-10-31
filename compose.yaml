@@ -1,5 +1,5 @@
 # Entrega 2: levantar la API con Docker Compose.
-# Todavia no se usa en la Entrega 1.
+#   docker compose up --build
 services:
   api:
     build: .

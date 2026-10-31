@@ -6,6 +6,10 @@ __pycache__
 *.pyc
 .env
 .ipynb_checkpoints
+# la API no los necesita para predecir
+.dvc
+data
 notebooks
-models/*.joblib
-models/*.pkl
+mlruns
+docs
+tests
