@@ -28,6 +28,7 @@ def df_raw():
 
 @pytest.fixture
 def client():
+    """Levanta la API en memoria para pegarle sin uvicorn."""
     # como context manager para que corra el startup de la API
     with TestClient(app) as c:
         yield c

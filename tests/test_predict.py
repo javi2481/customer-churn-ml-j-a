@@ -10,6 +10,7 @@ EJEMPLO_INVALIDO = CARPETA_PROYECTO / "examples" / "predict_request_invalid.json
 
 
 def test_predict_success(client, sample_customer):
+    """Cliente valido: 200 y los 4 campos con sus tipos."""
     response = client.post("/predict", json=sample_customer)
 
     assert response.status_code == 200
@@ -29,6 +30,7 @@ def test_predict_success(client, sample_customer):
 
 
 def test_predict_invalid_payload(client):
+    """El JSON invalido de examples/ devuelve 422."""
     payload = json.loads(EJEMPLO_INVALIDO.read_text(encoding="utf-8"))
 
     response = client.post("/predict", json=payload)
@@ -47,6 +49,7 @@ def test_predict_invalid_payload(client):
     ],
 )
 def test_invalid_customer_is_rejected(client, sample_customer, campo, valor):
+    """Un campo con valor invalido devuelve 422."""
     sample_customer[campo] = valor
 
     response = client.post("/predict", json=sample_customer)
@@ -55,6 +58,7 @@ def test_invalid_customer_is_rejected(client, sample_customer, campo, valor):
 
 
 def test_missing_field_is_rejected(client, sample_customer):
+    """Si falta un campo devuelve 422."""
     del sample_customer["Contract"]
 
     response = client.post("/predict", json=sample_customer)
@@ -63,6 +67,7 @@ def test_missing_field_is_rejected(client, sample_customer):
 
 
 def test_empty_body_is_rejected(client):
+    """Un JSON vacio devuelve 422."""
     response = client.post("/predict", json={})
 
     assert response.status_code == 422
