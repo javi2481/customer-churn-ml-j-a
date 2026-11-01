@@ -32,12 +32,9 @@ def health():
             model_loaded=True,
             model_version=MODEL_VERSION,
         )
-    except Exception:
-        return HealthResponse(
-            status="error",
-            model_loaded=False,
-            model_version=None,
-        )
+    except FileNotFoundError as exc:
+        # sin modelo el servicio no esta listo: 503, no 200
+        raise HTTPException(status_code=503, detail=str(exc)) from exc
 
 
 # Esta funcion sirve para recibir un cliente, validarlo y devolver la prediccion de churn
