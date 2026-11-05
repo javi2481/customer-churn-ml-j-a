@@ -19,7 +19,7 @@ Arriba esta lo de la entrega 1 y abajo lo que se sumo en la entrega 2.
 
 ```mermaid
 flowchart TD
-    subgraph E1["ENTREGA 1 · proyecto reproducible"]
+    subgraph E1["Entrega 1"]
         direction TB
         subgraph DATOS["1. Datos"]
             A[("DagsHub<br/>customer_churn_historical.csv")]
@@ -35,7 +35,7 @@ flowchart TD
         end
     end
 
-    subgraph E2["ENTREGA 2 · servicio de inferencia"]
+    subgraph E2["Entrega 2"]
         direction TB
         subgraph API["3. API de inferencia"]
             H["src/inference/predict.py<br/>carga el modelo y calcula risk_level"]
