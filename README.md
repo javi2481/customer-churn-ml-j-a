@@ -8,7 +8,7 @@ Prediccion de abandono de clientes (churn).
 | **Materia** | Laboratorio de Mineria de Datos |
 | **Año / cuatrimestre** | 2026 — 2.º cuatrimestre |
 | **Equipo** | Rodolfo Berrone y Andrea Romeo |
-| **Entrega** | 1ra entrega · despues lo afinamos con el feedback del profe |
+| **Entrega** | 2da entrega (tag `entrega-2`) · la 1ra esta en el tag `entrega-1` |
 
 Clasificacion binaria: estimar si un cliente de telecomunicaciones se va (`Churn`).
 
@@ -170,7 +170,56 @@ uvicorn app.main:app --reload --port 8000
 - Respuesta: `prediction`, `probability`, `risk_level` (`LOW`/`MEDIUM`/`HIGH`), `model_version`
 
 Los ejemplos de payload vienen del paquete de datos del curso (`examples/`).
-Pytest + Docker/Compose los cerramos con Andrea. Monitoring, CI y `request_id` quedan para mas adelante (no van en esta entrega).
+
+Si el JSON esta mal (falta un campo, tipo incorrecto o valor que no existe) la API devuelve `422`.
+Si no esta el modelo, `/health` y `/predict` devuelven `503`.
+
+## Tests
+
+```bash
+pytest
+```
+
+Que prueban:
+
+- `test_model_loader.py` — que el modelo exista y se pueda cargar
+- `test_predictor.py` — una prediccion valida, tipos de la respuesta y umbrales de `risk_level`
+- `test_health.py` — el endpoint `/health`
+- `test_predict.py` — el endpoint `/predict` con datos validos e invalidos (422)
+- `test_data_schema.py` y `test_preprocessing.py` — columnas del dataset y preprocesamiento
+
+Para correrlos hace falta el dataset (`dvc pull`) y el modelo (`python -m src.training.train`).
+
+## Docker
+
+El modelo va adentro de la imagen, asi que primero hay que generarlo:
+
+```bash
+dvc pull
+python -m src.training.train
+```
+
+Levantar la API:
+
+```bash
+docker compose up --build
+```
+
+Probarla (en otra terminal):
+
+```bash
+curl http://localhost:8000/health
+curl -X POST http://localhost:8000/predict -H "Content-Type: application/json" -d @examples/predict_request_valid.json
+```
+
+Swagger: http://localhost:8000/docs
+
+Ver logs y apagar:
+
+```bash
+docker compose logs
+docker compose down
+```
 
 ## Estado actual
 
@@ -181,3 +230,5 @@ Pytest + Docker/Compose los cerramos con Andrea. Monitoring, CI y `request_id` q
 - Dataset versionado con DVC.
 - Dataset almacenado en DagsHub mediante remote DVC.
 - Inferencia por consola + API `/health` y `/predict` (FastAPI).
+- Tests con pytest (API y logica de inferencia).
+- API en Docker y Docker Compose.
