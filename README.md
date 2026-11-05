@@ -81,8 +81,13 @@ flowchart TD
     class L,M docker
     class N cliente
 
-    style E1 fill:#f8fafc,stroke:#334155,stroke-width:2px,stroke-dasharray:6 4
-    style E2 fill:#fffbeb,stroke:#92400e,stroke-width:2px,stroke-dasharray:6 4
+    style E1 fill:#f8fafc,stroke:#334155,stroke-width:2px,stroke-dasharray:6 4,color:#0f172a
+    style E2 fill:#fffbeb,stroke:#92400e,stroke-width:2px,stroke-dasharray:6 4,color:#78350f
+    style DATOS fill:#eff6ff,stroke:#2563eb,color:#1e3a8a
+    style ENTRENAMIENTO fill:#f0fdf4,stroke:#16a34a,color:#14532d
+    style API fill:#fffbeb,stroke:#d97706,color:#78350f
+    style TESTS fill:#faf5ff,stroke:#9333ea,color:#581c87
+    style DOCKER fill:#ecfeff,stroke:#0891b2,color:#164e63
 ```
 
 ### Que hace cada parte
