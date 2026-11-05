@@ -12,6 +12,88 @@ Prediccion de abandono de clientes (churn).
 
 Clasificacion binaria: estimar si un cliente de telecomunicaciones se va (`Churn`).
 
+## Como funciona (entrega 2)
+
+Asi viaja un cliente desde los datos hasta la respuesta de la API.
+
+```mermaid
+flowchart TD
+    subgraph DATOS["1. Datos"]
+        A[("DagsHub<br/>customer_churn_historical.csv")]
+        B["data/raw/<br/>dataset local"]
+    end
+
+    subgraph ENTRENAMIENTO["2. Entrenamiento"]
+        C["src/data<br/>split 80/20"]
+        D["src/features<br/>impute + one-hot + scale"]
+        E["src/training/train.py<br/>6 runs"]
+        F[("MLflow<br/>runs + Model Registry<br/>churn-classifier v1")]
+        G[/"models/churn_pipeline.joblib"/]
+    end
+
+    subgraph API["3. API de inferencia"]
+        H["src/inference/predict.py<br/>carga el modelo y calcula risk_level"]
+        I["app/schemas.py<br/>Pydantic valida el JSON"]
+        J["app/main.py<br/>FastAPI"]
+    end
+
+    subgraph TESTS["4. Tests"]
+        K["pytest<br/>26 tests"]
+    end
+
+    subgraph DOCKER["5. Docker"]
+        L["Dockerfile<br/>imagen con el modelo adentro"]
+        M["compose.yaml<br/>puerto 8000"]
+    end
+
+    N(["Cliente<br/>curl o Swagger /docs"])
+
+    A -->|dvc pull| B
+    B --> C --> D --> E
+    E -->|registra| F
+    E -->|guarda el candidato| G
+    G --> H
+    I --> J
+    H --> J
+    J -.->|prueba| K
+    J --> L --> M
+    M -->|GET /health| N
+    M -->|POST /predict| N
+
+    classDef datos fill:#dbeafe,stroke:#2563eb,color:#1e3a8a
+    classDef train fill:#dcfce7,stroke:#16a34a,color:#14532d
+    classDef api fill:#fef3c7,stroke:#d97706,color:#78350f
+    classDef tests fill:#f3e8ff,stroke:#9333ea,color:#581c87
+    classDef docker fill:#cffafe,stroke:#0891b2,color:#164e63
+    classDef cliente fill:#fce7f3,stroke:#db2777,color:#831843
+
+    class A,B datos
+    class C,D,E,F,G train
+    class H,I,J api
+    class K tests
+    class L,M docker
+    class N cliente
+```
+
+### Que hace cada parte
+
+| Parte | Que hace |
+|---|---|
+| **1. Datos** (azul) | El CSV esta en DagsHub. Con `dvc pull` se baja a `data/raw/`. |
+| **2. Entrenamiento** (verde) | `train.py` separa train/test, preprocesa, entrena los modelos y los anota en MLflow. El candidato (logreg) queda en el Model Registry y en `models/` como joblib. |
+| **3. API** (amarillo) | Pydantic revisa que el JSON este bien. `predict.py` usa el joblib y devuelve `prediction`, `probability`, `risk_level` y `model_version`. |
+| **4. Tests** (violeta) | `pytest` prueba la carga del modelo, una prediccion valida, `/health`, `/predict` y entradas invalidas. |
+| **5. Docker** (celeste) | El Dockerfile arma la imagen con el modelo adentro y compose la levanta en el puerto 8000. |
+| **Cliente** (rosa) | Llama a `/health` para ver si anda y a `/predict` para pedir la prediccion. |
+
+### Que devuelve la API
+
+| Caso | Codigo |
+|---|---|
+| Todo bien | `200` |
+| JSON mal (falta un campo, tipo o valor incorrecto) | `422` |
+| No esta el modelo | `503` |
+
 ## Hasta ahora
 
 Notebooks de eda y exploracion:
