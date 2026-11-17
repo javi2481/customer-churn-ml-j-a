@@ -23,6 +23,7 @@ from src.features import build_preprocessor
 # src/training/ -> raiz del repo
 CARPETA_PROYECTO = Path(__file__).resolve().parent.parent.parent
 MODEL_PATH = CARPETA_PROYECTO / "models" / "churn_pipeline.joblib"
+VERSION_PATH = CARPETA_PROYECTO / "models" / "model_version.txt"
 MLRUNS_PATH = CARPETA_PROYECTO / "mlruns"
 
 # nombre del experimento en MLflow
@@ -175,6 +176,10 @@ def main():
     MODEL_PATH.parent.mkdir(exist_ok=True)
     joblib.dump(pipe_candidato, MODEL_PATH)
     print("Candidato guardado:", MODEL_PATH)
+
+    # la version del Registry va al lado del joblib, asi la API informa la real
+    VERSION_PATH.write_text(str(registrada.version), encoding="utf-8")
+    print("Version guardada:", VERSION_PATH)
     print("Runs en MLflow. Para verlos: mlflow ui --backend-store-uri", MLRUNS_PATH)
 
 

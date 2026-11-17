@@ -74,3 +74,27 @@ def test_empty_body_is_rejected(client):
     response = client.post("/predict", json={})
 
     assert response.status_code == 422
+
+
+# Esta funcion sirve para comprobar que TotalCharges puede venir nulo o no venir (el pipeline lo imputa)
+@pytest.mark.parametrize("quitar", [False, True])
+def test_total_charges_can_be_missing(client, sample_customer, quitar):
+    if quitar:
+        del sample_customer["TotalCharges"]
+    else:
+        sample_customer["TotalCharges"] = None
+
+    response = client.post("/predict", json=sample_customer)
+
+    assert response.status_code == 200
+    assert 0.0 <= response.json()["probability"] <= 1.0
+
+
+# Esta funcion sirve para comprobar que los montos negativos devuelven 422
+@pytest.mark.parametrize("campo", ["MonthlyCharges", "TotalCharges"])
+def test_negative_charges_are_rejected(client, sample_customer, campo):
+    sample_customer[campo] = -10.0
+
+    response = client.post("/predict", json=sample_customer)
+
+    assert response.status_code == 422

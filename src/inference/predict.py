@@ -18,8 +18,8 @@ import pandas as pd
 CARPETA_PROYECTO = Path(__file__).resolve().parent.parent.parent
 MODEL_PATH = CARPETA_PROYECTO / "models" / "churn_pipeline.joblib"
 
-# misma version que en el Model Registry (churn-classifier)
-MODEL_VERSION = "1"
+# version del Model Registry (churn-classifier); la escribe el train al lado del joblib
+VERSION_PATH = CARPETA_PROYECTO / "models" / "model_version.txt"
 
 # columnas de X en el train (sin customerID ni Churn)
 FEATURE_COLUMNS = [
@@ -65,6 +65,16 @@ def get_model():
     return _modelo
 
 
+# Esta funcion sirve para leer la version del modelo que realmente esta en models/
+def get_model_version():
+    if not VERSION_PATH.exists():
+        raise FileNotFoundError(
+            f"No esta la version del modelo en {VERSION_PATH}. "
+            "Corre primero: python -m src.training.train"
+        )
+    return VERSION_PATH.read_text(encoding="utf-8").strip()
+
+
 # Esta funcion sirve para pasar la probabilidad a LOW / MEDIUM / HIGH
 def risk_from_probability(probability):
     if probability < RISK_LOW_MAX:
@@ -92,7 +102,7 @@ def predict_churn(features: dict) -> dict:
         "prediction": "CHURN" if pred == 1 else "NO_CHURN",
         "probability": round(proba, 6),
         "risk_level": risk_from_probability(proba),
-        "model_version": MODEL_VERSION,
+        "model_version": get_model_version(),
     }
 
 
