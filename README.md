@@ -30,8 +30,8 @@ flowchart TD
             C["src/data<br/>split 80/20"]
             D["src/features<br/>impute + one-hot + scale"]
             E["src/training/train.py<br/>6 runs"]
-            F[("MLflow<br/>runs + Model Registry<br/>churn-classifier v1")]
-            G[/"models/churn_pipeline.joblib"/]
+            F[("MLflow<br/>runs + Model Registry<br/>churn-classifier")]
+            G[/"models/churn_pipeline.joblib<br/>+ model_version.txt"/]
         end
     end
 
@@ -44,12 +44,12 @@ flowchart TD
         end
 
         subgraph TESTS["4. Tests"]
-            K["pytest<br/>26 tests"]
+            K["pytest<br/>30 tests"]
         end
 
         subgraph DOCKER["5. Docker"]
             L["Dockerfile<br/>imagen con el modelo adentro"]
-            M["compose.yaml<br/>puerto 8000"]
+            M["compose.yaml<br/>puerto 8000 + healthcheck"]
         end
 
         N(["Cliente<br/>curl o Swagger /docs"])
@@ -95,10 +95,10 @@ flowchart TD
 | Entrega | Parte | Que hace |
 |---|---|---|
 | 1 | **1. Datos** (azul) | El CSV esta en DagsHub. Con `dvc pull` se baja a `data/raw/`. |
-| 1 | **2. Entrenamiento** (verde) | `train.py` separa train/test, preprocesa, entrena los modelos y los anota en MLflow. El candidato (logreg) queda en el Model Registry y en `models/` como joblib. |
-| 2 | **3. API** (amarillo) | Pydantic revisa que el JSON este bien. `predict.py` usa el joblib y devuelve `prediction`, `probability`, `risk_level` y `model_version`. |
+| 1 | **2. Entrenamiento** (verde) | `train.py` separa train/test, preprocesa, entrena los modelos y los anota en MLflow. El candidato (logreg) queda en el Model Registry y en `models/` como joblib, junto con `model_version.txt` (la version que le dio el Registry). |
+| 2 | **3. API** (amarillo) | Pydantic revisa que el JSON este bien. `predict.py` usa el joblib y devuelve `prediction`, `probability`, `risk_level` y `model_version` (leida de `model_version.txt`, no escrita a mano). |
 | 2 | **4. Tests** (violeta) | `pytest` prueba la carga del modelo, una prediccion valida, `/health`, `/predict` y entradas invalidas. |
-| 2 | **5. Docker** (celeste) | El Dockerfile arma la imagen con el modelo adentro y compose la levanta en el puerto 8000. |
+| 2 | **5. Docker** (celeste) | El Dockerfile arma la imagen con el modelo adentro y compose la levanta en el puerto 8000. Un healthcheck le pregunta a `/health` cada 30 segundos si la API esta sana. |
 | 2 | **Cliente** (rosa) | Llama a `/health` para ver si anda y a `/predict` para pedir la prediccion. |
 
 La flecha gruesa es la union entre las dos entregas: el modelo que sale del entrenamiento (entrega 1) es el que usa la API (entrega 2).
@@ -108,7 +108,7 @@ La flecha gruesa es la union entre las dos entregas: el modelo que sale del entr
 | Caso | Codigo |
 |---|---|
 | Todo bien | `200` |
-| JSON mal (falta un campo, tipo o valor incorrecto) | `422` |
+| JSON mal (falta un campo, tipo o valor incorrecto, monto negativo) | `422` |
 | No esta el modelo | `503` |
 
 ## Hasta ahora
@@ -248,7 +248,12 @@ Ejecutar el entrenamiento:
 python -m src.training.train
 ```
 
-El entrenamiento deja registrados los experimentos en MLflow y genera el modelo candidato en `models/`.
+El entrenamiento deja registrados los experimentos en MLflow y genera en `models/`:
+
+- `churn_pipeline.joblib` — el modelo candidato
+- `model_version.txt` — la version que le asigno el Model Registry
+
+Cada vez que se entrena, el Registry suma una version nueva y `model_version.txt` se actualiza solo. Asi la API siempre informa la version del modelo que realmente cargo.
 
 ## API de inferencia (entrega 2)
 
@@ -264,13 +269,17 @@ API con FastAPI (Swagger en `/docs`):
 uvicorn app.main:app --reload --port 8000
 ```
 
-- `GET /health` — si el servicio responde y que version de modelo cargo
+- `GET /health` — si el servicio responde y que version de modelo cargo (la lee de `models/model_version.txt`)
 - `POST /predict` — body = `examples/predict_request_valid.json`
 - Respuesta: `prediction`, `probability`, `risk_level` (`LOW`/`MEDIUM`/`HIGH`), `model_version`
 
 Los ejemplos de payload vienen del paquete de datos del curso (`examples/`).
 
-Si el JSON esta mal (falta un campo, tipo incorrecto o valor que no existe) la API devuelve `422`.
+`TotalCharges` es opcional: puede venir `null` o no venir. Pasa con los clientes nuevos (`tenure = 0`), que todavia no tienen total acumulado. El pipeline lo completa con la mediana que aprendio en el entrenamiento.
+
+`MonthlyCharges` y `TotalCharges` no pueden ser negativos.
+
+Si el JSON esta mal (falta un campo, tipo incorrecto, valor que no existe o monto negativo) la API devuelve `422`.
 Si no esta el modelo, `/health` y `/predict` devuelven `503`.
 
 ## Tests
@@ -283,15 +292,17 @@ Que prueban:
 
 - `test_model_loader.py` — que el modelo exista y se pueda cargar
 - `test_predictor.py` — una prediccion valida, tipos de la respuesta y umbrales de `risk_level`
-- `test_health.py` — el endpoint `/health`
-- `test_predict.py` — el endpoint `/predict` con datos validos e invalidos (422)
+- `test_health.py` — el endpoint `/health` y que la version informada sea la de `model_version.txt`
+- `test_predict.py` — el endpoint `/predict` con datos validos e invalidos (422), `TotalCharges` nulo o ausente (200) y montos negativos (422)
 - `test_data_schema.py` y `test_preprocessing.py` — columnas del dataset y preprocesamiento
 
 Para correrlos hace falta el dataset (`dvc pull`) y el modelo (`python -m src.training.train`).
 
 ## Docker
 
-El modelo va adentro de la imagen, asi que primero hay que generarlo:
+> **Importante:** el modelo va adentro de la imagen y no se sube a Git. Si no se entrena antes, `docker compose up --build` falla porque no encuentra la carpeta `models/`.
+
+Primero hay que generarlo:
 
 ```bash
 dvc pull
@@ -313,6 +324,14 @@ curl -X POST http://localhost:8000/predict -H "Content-Type: application/json" -
 
 Swagger: http://localhost:8000/docs
 
+Ver si el contenedor esta sano:
+
+```bash
+docker compose ps
+```
+
+En `STATUS` tiene que aparecer `(healthy)`. Docker le pregunta a `/health` cada 30 segundos; si falla 3 veces seguidas, lo marca `(unhealthy)`.
+
 Ver logs y apagar:
 
 ```bash
@@ -330,4 +349,6 @@ docker compose down
 - Dataset almacenado en DagsHub mediante remote DVC.
 - Inferencia por consola + API `/health` y `/predict` (FastAPI).
 - Tests con pytest (API y logica de inferencia).
-- API en Docker y Docker Compose.
+- API en Docker y Docker Compose, con healthcheck.
+- Version del modelo leida del artefacto (no fija en el codigo).
+- `TotalCharges` opcional en la API, igual que en el pipeline.
