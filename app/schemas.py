@@ -44,8 +44,9 @@ class CustomerFeatures(BaseModel):
     Contract: Contract
     PaperlessBilling: YesNo
     PaymentMethod: PaymentMethod
-    MonthlyCharges: float
-    TotalCharges: float
+    MonthlyCharges: float = Field(ge=0)
+    # puede venir vacio (clientes nuevos): el pipeline lo imputa con la mediana
+    TotalCharges: float | None = Field(default=None, ge=0)
 
 
 # Esta clase sirve para definir la respuesta de /predict
