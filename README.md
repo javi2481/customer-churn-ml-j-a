@@ -8,7 +8,7 @@ Prediccion de abandono de clientes (churn).
 | **Materia** | Laboratorio de Mineria de Datos |
 | **Año / cuatrimestre** | 2026 — 2.º cuatrimestre |
 | **Equipo** | Rodolfo Berrone y Andrea Romeo |
-| **Entrega** | 2da entrega (tag `entrega-2`) · la 1ra esta en el tag `entrega-1` |
+| **Entrega** | 2da entrega (tag `entrega-2`) · con las correcciones de la devolucion en el tag `entrega-2-correccion` · la 1ra esta en el tag `entrega-1` |
 
 Clasificacion binaria: estimar si un cliente de telecomunicaciones se va (`Churn`).
 
