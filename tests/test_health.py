@@ -1,4 +1,4 @@
-from src.inference.predict import MODEL_VERSION
+from src.inference.predict import VERSION_PATH
 
 
 # Esta funcion sirve para comprobar que /health responde ok, con el modelo cargado y su version
@@ -12,4 +12,5 @@ def test_health(client):
 
     assert data["status"] == "ok"
     assert data["model_loaded"] is True
-    assert data["model_version"] == MODEL_VERSION
+    # la version tiene que ser la que dejo el train en models/, no una fija
+    assert data["model_version"] == VERSION_PATH.read_text(encoding="utf-8").strip()

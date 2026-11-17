@@ -2,7 +2,7 @@
 
 import pytest
 
-from src.inference.predict import MODEL_VERSION, predict_churn, risk_from_probability
+from src.inference.predict import VERSION_PATH, predict_churn, risk_from_probability
 
 
 # Esta funcion sirve para comprobar que la prediccion trae los 4 campos con tipos y valores correctos
@@ -15,7 +15,7 @@ def test_predict_contract(sample_customer):
     assert isinstance(result["probability"], float)
     assert 0.0 <= result["probability"] <= 1.0
     assert result["risk_level"] in ["LOW", "MEDIUM", "HIGH"]
-    assert result["model_version"] == MODEL_VERSION
+    assert result["model_version"] == VERSION_PATH.read_text(encoding="utf-8").strip()
 
 
 # Esta funcion sirve para comprobar que el risk_level corresponde a la probabilidad

@@ -10,16 +10,18 @@ Swagger queda en /docs
 from fastapi import FastAPI, HTTPException
 
 from app.schemas import CustomerFeatures, HealthResponse, PredictResponse
-from src.inference.predict import MODEL_VERSION, get_model, predict_churn
+from src.inference.predict import get_model, get_model_version, predict_churn
 
-app = FastAPI(title="Customer Churn API", version=MODEL_VERSION)
+# version de la API (la del modelo se informa en /health y /predict)
+app = FastAPI(title="Customer Churn API", version="1.0")
 
 
 # Esta funcion sirve para cargar el modelo cuando arranca la API
 @app.on_event("startup")
 def startup():
-    # si no esta el joblib, mejor fallar al arrancar
+    # si no esta el joblib o su version, mejor fallar al arrancar
     get_model()
+    get_model_version()
 
 
 # Esta funcion sirve para avisar si el servicio esta arriba y que version de modelo cargo
@@ -30,7 +32,7 @@ def health():
         return HealthResponse(
             status="ok",
             model_loaded=True,
-            model_version=MODEL_VERSION,
+            model_version=get_model_version(),
         )
     except FileNotFoundError as exc:
         # sin modelo el servicio no esta listo: 503, no 200
